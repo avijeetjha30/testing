@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+
+  db:
+    image: postgres:14.2-alpine
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: expense_sharing
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgressy
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - '3030:3030'
+    depends_on:
+      - db
+    environment:
+      EXPENSE_SHARING_SETTING_DATABASES: '{"default":{"HOST":"db"}}'
+      EXPENSE_SHARING_SETTING_LOCAL_SETTINGS_PATH: 'local/settings.prod.py'
+
+volumes:
+  postgresql-data:
+    driver: local
